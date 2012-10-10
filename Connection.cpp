@@ -21,7 +21,7 @@ void Connection::start(){
     //stall processing until thread is done
     client_thread.join();
 }
-
+ 
 void Connection::thread_process(){
     size_t pos, length;
     bool quit = false;
