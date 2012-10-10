@@ -29,7 +29,13 @@ void Connection::thread_process(){
     std::cout << "~~~~~~~~~~~~~~Connection Started~~~~~~~~~~~~~~" << std::endl;
     //gets only the first row
     while(input_stream.find("\r\n") == std::string::npos){
-        client_socket.read_some(boost::asio::buffer(input_buffer, 512));
+        try{
+            length = (client_socket).read_some(boost::asio::buffer(input_buffer, 512));
+        }
+        catch(std::exception& e){
+            std::cout << "Exception1: " << e.what() << std::endl;
+            length = 0;
+        }
         input_stream.append(input_buffer);
     }
     
@@ -93,19 +99,20 @@ void Connection::thread_process(){
     if(int_content_length == 0){
         int_content_length = -1;
     }
-    length = 8192;
+    length = 512;
     //read content
-    while(length == 8192 && !error){
-        std::cout << length << std::endl;
+    while(length == 512){
         try{
-            length = (*second_socket).read_some(boost::asio::buffer(input_buffer, 8192), error);
+            length = (*second_socket).read_some(boost::asio::buffer(input_buffer, 512));
         }
         catch(std::exception& e){
-            std::cout << e.what();
+            std::cout << "Exception2: " << e.what() << std::endl;
             length = 0;
         }
-        input_stream = input_buffer;
+        
+        input_stream = std::string(input_buffer, length);
         boost::asio::write(client_socket, boost::asio::buffer(input_stream, length));
+        std::cout << length << std::endl;
         //std::cout << input_stream;
     }
     std::cout << std::endl;
