@@ -3,8 +3,8 @@
 #include <sstream>
 
 Connection::Connection(boost::asio::io_service& io_service) : client_socket(io_service){
-	input_stream = "";
-    output_stream = "";
+	input_stream = std::string("");
+    output_stream = std::string("");
 }
 
 boost::asio::ip::tcp::socket& Connection::get_socket(){
@@ -20,6 +20,7 @@ void Connection::start(){
     boost::thread client_thread(boost::bind(&Connection::thread_process, this));
     //stall processing until thread is done
     client_thread.join();
+    client_socket.close();
 }
  
 void Connection::thread_process(){
@@ -48,7 +49,7 @@ void Connection::thread_process(){
         type = input_stream.substr(0, pos);
         if(pos == std::string::npos && type.compare("GET") != 0){
             handle_error("405");
-            exit;
+            return;
         }
         input_stream.erase(0, pos + 1);
         pos = input_stream.find(" ");
@@ -56,13 +57,15 @@ void Connection::thread_process(){
         std::cout << url << std::endl;
         if(pos == std::string::npos){
             handle_error("400");
-            exit;
+            return;
         }
         //split url into host and resource
         pos = url.find("//");
         host = url.substr(pos + 2);
         if(pos == std::string::npos){
             handle_error("405");
+            quit = true;
+            return;
         }
         else{ 
             pos = host.find("/");
@@ -90,13 +93,13 @@ void Connection::thread_process(){
                     second_socket->connect(*endpoint_iterator++, _error);
                 }
 
-                output_stream = "GET ";
+                output_stream = std::string("GET ");
                 output_stream += url;
                 output_stream += " HTTP/1.0\r\n\r\n";
                 boost::asio::write(*second_socket, boost::asio::buffer(output_stream));
 
                 //read headers
-                input_stream = "";
+                input_stream = std::string("");
                 while(input_stream.find("\r\n\r\n") == std::string::npos){
                     (*second_socket).read_some(boost::asio::buffer(input_buffer, 1));
                     input_stream += input_buffer[0];
@@ -129,11 +132,10 @@ void Connection::thread_process(){
             }
         }   
     }
-    client_socket.close();
 }
 
 void Connection::handle_error(char* error){
-    output_stream = "HTTP status: ";
+    output_stream = std::string("HTTP status: ");
     output_stream += error;
     boost::asio::write(client_socket, boost::asio::buffer(output_stream));
 }
