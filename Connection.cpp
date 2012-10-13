@@ -38,7 +38,7 @@ void Connection::thread_process(){
             input_stream.append(input_buffer);
         }
         catch(std::exception& e){
-            std::cout << "Exception1: " << e.what() << std::endl;
+            std::cerr << "Exception1: " << e.what() << std::endl;
             quit = true;
         }
     }
@@ -56,7 +56,6 @@ void Connection::thread_process(){
         input_stream.erase(0, pos + 1);
         pos = input_stream.find(" ");
         url = input_stream.substr(0, pos);
-        std::cout << url << std::endl;
         if(pos == std::string::npos){
             handle_error("400");
             return;
@@ -71,6 +70,7 @@ void Connection::thread_process(){
         }
         else{
             quit = false;
+            i = 0;
             while(!quit && i < filters.size()){
                 pos = host.find(*filters[i]);
                 if(pos == std::string::npos){
@@ -96,7 +96,7 @@ void Connection::thread_process(){
                     endpoint_iterator = resolver.resolve(query);
                 }
                 catch(std::exception& e){
-                    std::cout << "Exception2: " << e.what() << std::endl;
+                    std::cerr << "Exception2: " << e.what() << std::endl;
                     handle_error("404");
                     quit = true;
                 }
@@ -131,7 +131,7 @@ void Connection::thread_process(){
                             boost::asio::write(client_socket, boost::asio::buffer(input_stream, length));
                         }
                         catch(std::exception& e){
-                            std::cout << "Exception3: " << e.what() << std::endl;
+                            std::cerr << "Exception3: " << e.what() << std::endl;
                             quit = true;
                         }
                     }

@@ -36,10 +36,12 @@ int main(int argc, const char* argv[]){
     else{
         while(!infile.eof()){
             infile.getline(filter, 100);
-            tmp_filter_pointer = new std::string(filter);
-            filters.push_back(tmp_filter_pointer);
+            if(strlen(filter) > 0){
+                tmp_filter_pointer = new std::string(filter);
+                filters.push_back(tmp_filter_pointer);
+            }
+            
         }
-        std::cout << std::endl;
     }
     
     infile.close();
