@@ -33,11 +33,11 @@ Instructions for running on Windows
 
 3. Open a Visual Studio project, and add all the *.cpp and *.h files
 
-4. Go to Project->Properties->Configuration Properties->C/C++->General under Additional Include Directories add path to your boost includes
-e.g. D:\apps\boost\boost_1_42
+4. Go to Project->Properties->Configuration Properties->C/C++->General under Additional Include Directories add path to your boost includes.
+e.g. (D:\apps\boost\boost_1_51)
 
-5. Go to Project->Properties->Configuration Properties->Linker->General under Additional Library Dependencies add path to your boost lib directory
-e.g. D:\apps\boost\boost_1_42\lib
+5. Go to Project->Properties->Configuration Properties->Linker->General under Additional Library Dependencies add path to your boost lib directory.
+e.g. (D:\apps\boost\boost_1_51\lib)
 
 6. Press run.
 
