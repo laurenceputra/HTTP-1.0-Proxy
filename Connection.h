@@ -1,6 +1,7 @@
 #ifndef CONNECTION
 #define CONNECTION
 #include <string>
+#include <vector>
 #include <stdlib.h>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
@@ -9,7 +10,7 @@
 
 class Connection : public boost::enable_shared_from_this<Connection>{
     public:
-        Connection(boost::asio::io_service& io_service);
+        Connection(boost::asio::io_service& io_service, std::vector <std::string*> new_filters);
         ~Connection();
         boost::asio::ip::tcp::socket& get_socket();
         void start();
@@ -32,8 +33,7 @@ class Connection : public boost::enable_shared_from_this<Connection>{
         std::string host;
         std::string resource;
         std::string port;
-        std::string content_length;
-        int int_content_length;
+        std::vector <std::string*> filters;
 };
 
 #endif
