@@ -15,14 +15,6 @@ boost::asio::ip::tcp::socket& Connection::get_socket(){
 Connection::~Connection(){
     std::cout <<  "~~~~~~~~~~~~~~Connection Closed~~~~~~~~~~~~~~" << std::endl;
 }
-
-void Connection::start(){
-    //spawn a new thread to handle each new incoming connection
-    boost::thread client_thread(boost::bind(&Connection::thread_process, this));
-    //stall processing until thread is done
-    client_thread.join();
-    client_socket.close();
-}
  
 void Connection::thread_process(){
     size_t pos, length;
@@ -117,22 +109,31 @@ void Connection::thread_process(){
 
                     //read headers
                     input_stream = std::string("");
-                    while(input_stream.find("\r\n\r\n") == std::string::npos){
-                        (*second_socket).read_some(boost::asio::buffer(input_buffer, 1));
-                        input_stream += input_buffer[0];
-                    }
-                    boost::asio::write(client_socket, boost::asio::buffer(input_stream));
-
-                    //read content
-                    while(!quit){
+                    while(input_stream.find("\r\n\r\n") == std::string::npos && !quit){
                         try{
-                            length = (*second_socket).read_some(boost::asio::buffer(input_buffer, 512));
-                            input_stream = std::string(input_buffer, length);
-                            boost::asio::write(client_socket, boost::asio::buffer(input_stream, length));
+                            (*second_socket).read_some(boost::asio::buffer(input_buffer, 1));
+                            input_stream += input_buffer[0];
                         }
                         catch(std::exception& e){
                             std::cerr << "Exception3: " << e.what() << std::endl;
+                            handle_error("404");
                             quit = true;
+                        }
+                    }
+                    if(!quit){
+                        boost::asio::write(client_socket, boost::asio::buffer(input_stream));
+
+                        //read content
+                        while(!quit){
+                            try{
+                                length = (*second_socket).read_some(boost::asio::buffer(input_buffer, 512));
+                                input_stream = std::string(input_buffer, length);
+                                boost::asio::write(client_socket, boost::asio::buffer(input_stream, length));
+                            }
+                            catch(std::exception& e){
+                                std::cerr << "Exception4: " << e.what() << std::endl;
+                                quit = true;
+                            }
                         }
                     }
                 }
@@ -143,6 +144,6 @@ void Connection::thread_process(){
 
 void Connection::handle_error(char* error){
     output_stream = std::string("HTTP status: ");
-    output_stream += error;
+    output_stream += std::string(error);
     boost::asio::write(client_socket, boost::asio::buffer(output_stream));
 }

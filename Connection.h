@@ -13,7 +13,6 @@ class Connection : public boost::enable_shared_from_this<Connection>{
         Connection(boost::asio::io_service& io_service, std::vector <std::string*> new_filters);
         ~Connection();
         boost::asio::ip::tcp::socket& get_socket();
-        void start();
         void thread_process();
         void handle_client_read(const boost::system::error_code& error);
         void handle_server_read(const boost::system::error_code& error);

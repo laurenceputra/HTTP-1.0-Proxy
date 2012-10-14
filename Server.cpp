@@ -15,7 +15,7 @@ Server::~Server(){
 void Server::accept_handler(boost::shared_ptr<Connection> connection, const boost::system::error_code& error){
 	if(!error){
 		std::cout << "New Server Connection Accepted!" << std::endl;
-		(*connection).start();
+		boost::thread client_thread(boost::bind(&Connection::thread_process, connection));
 		boost::shared_ptr<Connection> new_connection(new Connection(boost_io_service, filters));
 		tcp_acceptor.async_accept((*new_connection).get_socket(),
 			boost::bind(&Server::accept_handler, this, new_connection, boost::asio::placeholders::error));
