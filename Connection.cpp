@@ -42,21 +42,21 @@ void Connection::thread_process(){
         pos = input_stream.find(" ");
         type = input_stream.substr(0, pos);
         if(pos == std::string::npos && type.compare("GET") != 0){
-            handle_error("405");
+            handle_error(std::string("405"));
             return;
         }
         input_stream.erase(0, pos + 1);
         pos = input_stream.find(" ");
         url = input_stream.substr(0, pos);
         if(pos == std::string::npos){
-            handle_error("400");
+            handle_error(std::string("400"));
             return;
         }
         //split url into host and erase resource
         pos = url.find("//");
         host = url.substr(pos + 2);
         if(pos == std::string::npos){
-            handle_error("405");
+            handle_error(std::string("405"));
             quit = true;
             return;
         }
@@ -73,7 +73,7 @@ void Connection::thread_process(){
                 }
             }
             if(quit){
-                handle_error("403");
+                handle_error(std::string("403"));
                 return;
             }
             else{
@@ -89,7 +89,7 @@ void Connection::thread_process(){
                 }
                 catch(std::exception& e){
                     std::cerr << "Exception2: " << e.what() << std::endl;
-                    handle_error("404");
+                    handle_error(std::string("404"));
                     quit = true;
                 }
 
@@ -116,7 +116,7 @@ void Connection::thread_process(){
                         }
                         catch(std::exception& e){
                             std::cerr << "Exception3: " << e.what() << std::endl;
-                            handle_error("404");
+                            handle_error(std::string("404"));
                             quit = true;
                         }
                     }
@@ -142,8 +142,8 @@ void Connection::thread_process(){
     }
 }
 
-void Connection::handle_error(char* error){
+void Connection::handle_error(std::string error){
     output_stream = std::string("HTTP status: ");
-    output_stream += std::string(error);
+    output_stream += error;
     boost::asio::write(client_socket, boost::asio::buffer(output_stream));
 }

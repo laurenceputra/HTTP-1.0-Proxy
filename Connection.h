@@ -16,7 +16,7 @@ class Connection : public boost::enable_shared_from_this<Connection>{
         void thread_process();
         void handle_client_read(const boost::system::error_code& error);
         void handle_server_read(const boost::system::error_code& error);
-        void handle_error(char* error);
+        void handle_error(std::string error);
 
     private:
         bool running;
