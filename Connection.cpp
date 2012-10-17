@@ -143,7 +143,11 @@ void Connection::thread_process(){
 }
 
 void Connection::handle_error(std::string error){
-    output_stream = std::string("HTTP status: ");
-    output_stream += error;
+    std::string response_html = std::string("<!DOCTYPE HTML><html><head><title>")+ error + std::string("</title></head><body><h1>HTTP Status Code: ") + error + std::string("</h1></body></html>");
+    output_stream = std::string("HTTP/1.0 ") + error + std::string(" ERROR\r\n");
+    output_stream += std::string("Content-Type: text/html; charset=utf-8\r\n");
+    output_stream += std::string("Content-Length: ") + static_cast<std::ostringstream*>( &(std::ostringstream() << response_html.length()))->str() + std::string("\r\n\r\n");
+    output_stream += response_html;
+    std::cout << output_stream << std::endl;
     boost::asio::write(client_socket, boost::asio::buffer(output_stream));
 }
