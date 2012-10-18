@@ -148,6 +148,5 @@ void Connection::handle_error(std::string error){
     output_stream += std::string("Content-Type: text/html; charset=utf-8\r\n");
     output_stream += std::string("Content-Length: ") + static_cast<std::ostringstream*>( &(std::ostringstream() << response_html.length()))->str() + std::string("\r\n\r\n");
     output_stream += response_html;
-    std::cout << output_stream << std::endl;
     boost::asio::write(client_socket, boost::asio::buffer(output_stream));
 }
